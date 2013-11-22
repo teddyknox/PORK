@@ -1,0 +1,7 @@
+- Members: Will Potter, Will Moore, Teddy Knox
+- Summary: Wrote a script to scrape Reddit historical data, learned of the undocumented block from historical reddit link listings. Downloaded 1.8G Stanford Snap Reddit image submission dataset. https://snap.stanford.edu/data/web-Reddit.html Exploring regression methods. 
+- Results: We have 132,000 examples in a .csv format. Additionally, we have a scraper that can pull recent submissions into our database to add to the data. We are investigating movingthe data into an sqlite DB for performance enhancement.
+- Problems: Reddit doesn’t let you download the post listings from more than a couple days ago, not to worry though, Stanford had remedied this. 
+- Solved Problems: Reddits API only goes back 100 pages, so we would have only been able to get about 2500 examples. This led us to reconsider the idea, and move towards considering other datasets. In a spurt of last minute glory, we found a 130,000 example dataset that we can partition into Dev/Train/Test sets reliably. The bulk of our work was research around actually procuring the data.
+- Hours: 3 each 
+- Code: github.com/teddyknox/PORK
