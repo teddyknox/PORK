@@ -20,7 +20,7 @@ class Post(Model):
 # Post.create_table()
 
 if __name__ == '__main__':
-
+    db.connect()
     running = True
 
     # unix timestamp of two weeks ago
