@@ -5,11 +5,11 @@ from peewee import *
 from datetime import datetime, timedelta
 import time
 import argparse
+import csv
 
 # database
 db = SqliteDatabase('reddit.db')
 
-# model
 class Post(Model):
     pid = PrimaryKeyField()
     fullname = CharField(max_length=10)
@@ -17,10 +17,31 @@ class Post(Model):
     score = IntegerField()
     created_utc = IntegerField()
 
-    class Meta:
-        database = db # this model uses the reddit database
+#     # image_id = IntegerField()
+#     # unixtime = IntegerField()
+#     # rawtime = CharField()
+#     # title = CharField()
+#     # total_votes = IntegerField()
+#     # reddit_id = IntegerField()
+#     # number_of_upvotes = IntegerField()
+#     # subreddit = CharField()
+#     # number_of_downvotes = IntegerField()
+#     # localtime = IntegerField()
+#     # score = IntegerField()
+#     # number_of_comments = IntegerField()
+#     # username = CharField()
 
-def start():
+    # class Meta:
+    #     database = db # this model uses the reddit database
+
+def load(filename):
+    db.connect()
+    Post.create_table(True) # Fail silently if table already exists
+    with open(filename, 'r') as csvfile:
+        for row in csv.DictReader(csvfile):
+            print "%d\t%s" % (int(row['score']), row['title'])
+
+def scrape():
     db.connect()
     Post.create_table(True) # Fail silently if table already exists
 
@@ -57,8 +78,6 @@ def start():
                 'score': post_json['score'],
                 'created_utc': post_json['created_utc']
             }
-            # if post_dict['created_utc'] < threshold_timestamp:
-                # print "before threshold"
             post_obj = Post(**post_dict).save()
 
         # should we wait until our next query? how long?
@@ -71,5 +90,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Scrape reddit links using API.')
     parser.add_argument('action', help="Right now the only action is 'start'")
     args = parser.parse_args()
-    if args.action == 'start':
-        start()
+    if args.action == 'scrape':
+        scrape()
+    elif args.action == 'load':
+        load('reddit.csv')
