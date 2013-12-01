@@ -22,7 +22,7 @@ def load_reddit(filename, vectorizer=None, test_size=-1):
 
     # data = np.empty( (n_examples, n_features) )
     titles = []
-    target = np.empty((n_examples,), dtype=np.int32)
+    target = np.empty((n,), dtype=np.int32)
     feature_names = next(data_file)
     np.array(feature_names)
     for i, d in enumerate(data_file):
