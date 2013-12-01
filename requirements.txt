@@ -1,3 +1,9 @@
+numpy
+scipy
+scikit-learn
 requests
 argparse
-peewee
+flask
+flask-assets
+cssmin
+jsmin
