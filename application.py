@@ -6,9 +6,6 @@ from regress import model, vectorizer, load_reddit
 app = Flask(__name__)
 assets = Environment(app)
 
-data, target = load_reddit('reddit.csv', debug=True)
-model.fit(data, target)
-
 # static assets
 js = Bundle('js/vendor/modernizr-2.6.2-respond-1.1.0.min.js', 
             'js/vendor/jquery-1.10.1.min.js', 
@@ -20,14 +17,19 @@ css = Bundle('css/bootstrap.min.css',
 assets.register('js_all', js)
 assets.register('css_all', css)
 
+data, target = load_reddit('reddit.csv', vectorizer, num_examples=1000)
+model.fit(data, target)
+
 @app.route('/', methods=['GET'])
 def index():
+    template_params = {}
     title = request.args.get('title', None)
     if title:
         X = vectorizer.transform([title]).toarray()
         y = model.predict(X)
-        print y
-    return render_template('index.html', title=title, pred=y[0])
+        template_params['title'] = title
+        template_params['pred'] = y[0] 
+    return render_template('index.html', **template_params)
 
 if __name__ == '__main__':
     app.run(debug=True)
