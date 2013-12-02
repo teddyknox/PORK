@@ -6,20 +6,22 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 import argparse
 
-class Regressor(GradientBoostingRegressor):
-    def __init__(self):
-        super(Regressor, self).__init__(n_estimators=100, learning_rate=1.0, max_depth=1, random_state=0, loss='ls')
-
-class Vectorizer(TfidfVectorizer):
-    def __init__(self):
-        super(Vectorizer, self).__init__(stop_words='english', max_features=10000, analyzer='word', ngram_range=(1, 3),
-        token_pattern=ur'\b\w+\b', min_df=1)
-
 class Model(object):
     def __init__(self, filename=None, num_examples=None, force_train=False):
         if (not force_train and not self.unpickle()) or force_train: # if we don't want to retrain and we have nothing to load
-            self.reg = Regressor()                                   # or if we want to retrain
-            self.vectorizer = Vectorizer()
+            self.reg = GradientBoostingRegressor(
+                n_estimators=100,
+                learning_rate=1.0,
+                max_depth=1,
+                random_state=0, 
+                loss='ls')
+            self.vectorizer = TfidfVectorizer(
+                stop_words='english', 
+                max_features=10000, 
+                analyzer='word', 
+                ngram_range=(1, 3),
+                token_pattern=ur'\b\w+\b', 
+                min_df=1)
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
