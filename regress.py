@@ -8,6 +8,9 @@ import argparse
 
 class Model(object):
     def __init__(self, filename=None, num_examples=None, force_train=False):
+        self.filename = filename
+        self.num_examples = num_examples
+        
         if (not force_train and not self.unpickle()) or force_train: # if we don't want to retrain and we have nothing to load
             self.reg = GradientBoostingRegressor(
                 n_estimators=100,
@@ -92,7 +95,7 @@ class Model(object):
         for i, d in enumerate(data_file):
             if i == n_examples:
                 break
-            titles.append(d[10])
+            titles.append(d[10]) # the tenth item is the 'score'
             target[i] = d[10]
         data = self.vectorizer.fit_transform(titles).toarray()
         return data, target
