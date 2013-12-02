@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template, request
 from flask.ext.assets import Environment, Bundle
-from regress import model, vectorizer, load_reddit
+from regress import Model
 
 app = Flask(__name__)
 assets = Environment(app)
@@ -17,8 +17,7 @@ css = Bundle('css/bootstrap.min.css',
 assets.register('js_all', js)
 assets.register('css_all', css)
 
-data, target = load_reddit('reddit.csv', vectorizer, num_examples=1000)
-model.fit(data, target)
+model = Model('reddit.csv', num_examples=1000)
 
 @app.route('/', methods=['GET'])
 def index():
