@@ -36,7 +36,8 @@ class Model(object):
         try:
             with open('model.pickle') as model_file, open('vectorizer.pickle') as vector_file:
                 try:
-                    self.model = pickle.load(model_file)
+                    # self.model = pickle.load(model_file)
+                    self.reg = pickle.load(model_file)
                     self.vectorizer = pickle.load(vector_file)
                     return True
                 except pickle.UnpicklingError as e:
@@ -49,7 +50,7 @@ class Model(object):
     def save(self):
         if self.trained:
             print "Saving model"
-            with open('model.pickle', '+wb') as model_file, open('vectorizer.pickle', '+wb') as vector_file:
+            with open('model.pickle', 'wb') as model_file, open('vectorizer.pickle', 'wb') as vector_file:
                 try:
                     pickle.dump(self.reg, model_file)
                     pickle.dump(self.vectorizer, vector_file)
@@ -85,7 +86,7 @@ class Model(object):
         n_features = int(shape[1])
 
         if num_examples:
-            n_examples = min(n_examples, num_examples)
+            n_examples = min(n_examples, int(num_examples))
 
         # data = np.empty( (n_examples, n_features) )
         titles = []
