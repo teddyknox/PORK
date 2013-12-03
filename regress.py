@@ -11,8 +11,9 @@ class Model(object):
         self.filename = filename
         self.num_examples = num_examples
         
+        # short-circuit conditional
         if (not force_train and not self.unpickle()) or force_train: # if we don't want to retrain and we have nothing to load
-            self.reg = GradientBoostingRegressor(
+            self.reg = GradientBoostingRegressor(                    # or we do want to retrain
                 n_estimators=100,
                 learning_rate=1.0,
                 max_depth=1,
@@ -66,6 +67,12 @@ class Model(object):
         data, target = self.load_reddit_csv(filename=fn, num_examples=ne)
         self.reg.fit(data, target)
         self.trained = True
+
+    def predict(self, title):
+        ''' Takes as input a title string and returns the predicted score value. '''
+        X = self.vectorizer.transform([title]).toarray()
+        y = self.reg.predict(X)
+        return y[0]
 
     def train_test(self, filename=None, num_examples=None):
         ''' Trains and academically tests the regressor. Does not trip the trained flag.'''

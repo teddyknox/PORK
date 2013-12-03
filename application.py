@@ -21,14 +21,12 @@ model = Model('reddit.csv', num_examples=1000)
 
 @app.route('/', methods=['GET'])
 def index():
-    template_params = {}
+    cxt = {}
     title = request.args.get('title', None)
     if title:
-        X = vectorizer.transform([title]).toarray()
-        y = model.predict(X)
-        template_params['title'] = title
-        template_params['pred'] = y[0] 
-    return render_template('index.html', **template_params)
+        cxt['title'] = title
+        cxt['pred'] = model.predict(title)
+    return render_template('index.html', **cxt)
 
 if __name__ == '__main__':
     app.run(debug=True)
