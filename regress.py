@@ -3,8 +3,8 @@ import numpy as np
 import pickle
 import time
 from sklearn import cross_validation
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
-from sklearn.linear_model import LogisticRegression, LinearRegression
+from sklearn.feature_extraction.text import HashingVectorizer
+from sklearn.linear_model import LogisticRegression
 import argparse
 
 class Model(object):
@@ -15,7 +15,8 @@ class Model(object):
         # short-circuit conditional
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression(penalty='l2')
-            self.vectorizer = CountVectorizer(ngram_range=(1,3))
+            self.vectorizer = HashingVectorizer(
+                ngram_range=(1,3))
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
@@ -59,7 +60,9 @@ class Model(object):
         start = time.time()
         fn = filename or self.filename
         ne = num_examples or self.num_examples        
+        print "Loading data"
         data, target = self.load_reddit_csv(filename=fn, num_examples=ne)
+        print "Training model"
         print time.time() - start, "seconds to vectorize"
         start = time.time()
         print "Training model"
@@ -97,9 +100,11 @@ class Model(object):
 
         # data = np.empty( (n_examples, n_features) )
         target_list = list(array_generator(data_file, 10, n_examples))
-        target = np.array(target_list, dtype=np.int32)
+        titles = array_generator(data_file, 3, n_examples)
 
-        data = self.vectorizer.fit_transform(array_generator(data_file, 3, n_examples)).toarray()
+        target = np.array(target_list, dtype=np.int32)
+        data = self.vectorizer.fit_transform(titles).toarray()
+        print data.shape
         return data, target
 
 def array_generator(iterator, index, n):
@@ -107,6 +112,7 @@ def array_generator(iterator, index, n):
     while i < n:
         yield next(iterator)[index] # title
         i += 1
+    print i
 
 if __name__ == '__main__': # run from command line
     parser = argparse.ArgumentParser(description='Build or test a model using reddit.csv file.')
