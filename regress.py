@@ -2,7 +2,7 @@ import csv, copy
 import numpy as np
 import pickle
 from sklearn import cross_validation
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor, LinearRegression, LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 import argparse
@@ -13,10 +13,29 @@ class Model(object):
         self.num_examples = num_examples
 
         # short-circuit conditional
-        if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
-            self.reg = LogisticRegression(penalty='l2')
-            self.vectorizer = TfidfVectorizer(
-                ngram_range=(1,3))
+        if (not force_train and not self.unpickle()) or force_train: # if we don't want to retrain and we have nothing to load
+            self.reg = LogisticRegression()
+            # self.reg = GradientBoostingRegressor(                    # or we do want to retrain
+            #     n_estimators=100,
+            #     learning_rate=1.0,
+            #     max_depth=1,
+            #     random_state=0, 
+            #     loss='ls')
+            # self.vectorizer = TfidfVectorizer(
+            #     stop_words='english', 
+            #     max_features=10000, 
+            #     analyzer='word', 
+            #     ngram_range=(1, 3),
+            #     token_pattern=ur'\b\w+\b', 
+            #     min_df=1)
+            self.vectorizer = CountVectorizer(
+                # strip_accents='unicode', 
+                # max_features=10000,
+                # analyzer='word', 
+                # token_pattern=ur'\b\w+\b', 
+                # lowercase=True, 
+                ngram_range=(1,1)
+            )
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
