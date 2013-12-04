@@ -2,7 +2,6 @@ import csv, copy
 import numpy as np
 import pickle
 from sklearn import cross_validation
-from sklearn.ensemble import GradientBoostingRegressor, LinearRegression, LogisticRegression
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
 from sklearn.linear_model import LogisticRegression
 import argparse
