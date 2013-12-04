@@ -95,10 +95,19 @@ class Model(object):
         feature_names = np.array(next(data_file))
 
         # data = np.empty( (n_examples, n_features) )
-        target_list = list(array_generator(data_file, 10, n_examples))
-        target = np.array(target_list, dtype=np.int32)
-
-        data = self.vectorizer.fit_transform(array_generator(data_file, 3, n_examples)).toarray()
+        titles = []
+        target = np.empty((n_examples,), dtype=np.int32)
+        feature_names = next(data_file)
+        np.array(feature_names)
+        max_v = -1
+        for i, d in enumerate(data_file):
+            if i == n_examples:
+                break
+            titles.append(d[3]) # the tenth item is the 'score'
+            target[i] = d[10]
+            max_v = i
+        print "Using examples 0 -", max_v
+        data = self.vectorizer.fit_transform(titles).toarray()
         return data, target
 
 def array_generator(iterator, index, n):
