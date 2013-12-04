@@ -66,6 +66,7 @@ class Model(object):
         print "Training model"
         print time.time() - start, "seconds to vectorize"
         start = time.time()
+        print "Training model"
         self.reg.fit(data, target)
         print time.time() - start, "seconds to train"
         self.trained = True
