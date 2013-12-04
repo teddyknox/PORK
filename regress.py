@@ -4,34 +4,27 @@ import pickle
 from sklearn import cross_validation
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 import argparse
 
 class Model(object):
     def __init__(self, filename=None, num_examples=None, force_train=False):
         self.filename = filename
         self.num_examples = num_examples
-        
+
         # short-circuit conditional
-        if (not force_train and not self.unpickle()) or force_train: # if we don't want to retrain and we have nothing to load
-            self.reg = GradientBoostingRegressor(                    # or we do want to retrain
-                n_estimators=100,
-                learning_rate=1.0,
-                max_depth=1,
-                random_state=0, 
-                loss='ls')
-            self.vectorizer = TfidfVectorizer(
-                stop_words='english', 
-                max_features=10000, 
-                analyzer='word', 
-                ngram_range=(1, 3),
-                token_pattern=ur'\b\w+\b', 
-                min_df=1)
+        if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
+            self.reg = LogisticRegression(penalty='l2')
+            self.vectorizer = CountVectorizer(
+                ngram_range=(1,3))
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
                 self.save()
             else:
                 self.trained = False
+        else:
+            print "Already trained."
 
     def unpickle(self):
         try:
@@ -58,7 +51,7 @@ class Model(object):
                 except pickle.PicklingError as e:
                     print "Error pickling"
         else:
-            print "Model not trained, so why save?."
+            print "Model not trained, so why save?"
 
     def train(self, filename=None, num_examples=None):
         print "Building model"
@@ -82,7 +75,7 @@ class Model(object):
         data, target = self.load_reddit_csv(fn, ne)
         n_examples = data.shape[0]
         print "Testing model"
-        cv = cross_validation.ShuffleSplit(n_examples, n_iter=10, test_size=.8)
+        cv = cross_validation.ShuffleSplit(n_examples, n_iter=4, test_size=.8)
         results = cross_validation.cross_val_score(self.reg, data, target, cv=cv, scoring='r2', n_jobs=4)
         print sum(results)/len(results)
 
@@ -93,8 +86,7 @@ class Model(object):
         n_features = int(shape[1])
 
         if num_examples:
-            n_examples = min(n_examples, int(num_examples))
-
+            n_examples = min(n_examples, num_examples)
         # data = np.empty( (n_examples, n_features) )
         titles = []
         target = np.empty((n_examples,), dtype=np.int32)
@@ -106,18 +98,18 @@ class Model(object):
             titles.append(d[3]) # the tenth item is the 'score'
             target[i] = d[10]
         data = self.vectorizer.fit_transform(titles).toarray()
+        print data
+        print target
         return data, target
 
 if __name__ == '__main__': # run from command line
     parser = argparse.ArgumentParser(description='Build or test a model using reddit.csv file.')
-    parser.add_argument('action', choices=['test', 'build'], default='test', help="")
-    parser.add_argument('--debug', dest='num_examples', action='store', nargs='?', const='1000', help="Train on a subset of given examples")
+    parser.add_argument('--test', action='store_true', help="Whether to test")
+    parser.add_argument('--debug', dest='num_examples', type=int, action='store', nargs='?', const='1000', help="Train on a subset of given examples")
+    parser.add_argument('--force', dest='force_train', action='store_true', help="Force retrain dataset")    
     args = parser.parse_args()
 
     # initialize model
-    model = Model('reddit.csv', num_examples=args.num_examples)
-    if args.action == 'test':
+    model = Model('test.csv', num_examples=args.num_examples, force_train=args.force_train)    
+    if args.test:
         model.train_test()
-    elif args.action == 'build':
-        model.train()
-        model.save()
