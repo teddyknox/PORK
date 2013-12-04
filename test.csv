@@ -1,6 +1,7 @@
-4,13
+5,13
 image_id,unixtime,rawtime,title,total_votes,reddit_id,number_of_upvotes,subreddit,number_of_downvotes,localtime,score,number_of_comments,username
 0,1,2,hello world,4,5,6,7,8,9,100,11,12
-0,1,2,hello universe,4,5,6,7,8,9,50,11,12
+0,1,2,hello universe,4,5,6,7,8,9,75,11,12
 0,1,2,hello country,4,5,6,7,8,9,50,11,12
-0,1,2,hello state,4,5,6,7,8,9,50,11,12
+0,1,2,hello state,4,5,6,7,8,9,25,11,12
+0,1,2,country state,4,5,6,7,8,9,0,11,12
