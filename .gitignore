@@ -37,3 +37,4 @@ nosetests.xml
 
 static/.webassets-cache/
 
+*.pickle
