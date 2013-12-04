@@ -110,6 +110,6 @@ if __name__ == '__main__': # run from command line
     args = parser.parse_args()
 
     # initialize model
-    model = Model('test.csv', num_examples=args.num_examples, force_train=args.force_train)    
+    model = Model('reddit.csv', num_examples=args.num_examples, force_train=args.force_train)    
     if args.test:
         model.train_test()
