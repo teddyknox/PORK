@@ -3,13 +3,8 @@ import numpy as np
 import pickle
 import time
 from sklearn import cross_validation
-<<<<<<< HEAD
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.linear_model import LogisticRegression
-=======
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
-from sklearn.linear_model import LogisticRegression, LinearRegression
->>>>>>> c46ce1f49ca750f997992deaee448a4da0b29aa6
 import argparse
 
 class Model(object):
@@ -20,35 +15,8 @@ class Model(object):
         # short-circuit conditional
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression(penalty='l2')
-<<<<<<< HEAD
             self.vectorizer = HashingVectorizer(
                 ngram_range=(1,3))
-            self.reg = LogisticRegression()
-            # self.reg = GradientBoostingRegressor(                    # or we do want to retrain
-            #     n_estimators=100,
-            #     learning_rate=1.0,
-            #     max_depth=1,
-            #     random_state=0, 
-            #     loss='ls')
-            # self.vectorizer = TfidfVectorizer(
-            #     stop_words='english', 
-            #     max_features=10000, 
-            #     analyzer='word', 
-            #     ngram_range=(1, 3),
-            #     token_pattern=ur'\b\w+\b', 
-            #     min_df=1)
-            self.vectorizer = HashingVectorizer(
-                # strip_accents='unicode', 
-                # max_features=10000,
-                # analyzer='word', 
-                # token_pattern=ur'\b\w+\b', 
-                # lowercase=True, 
-                ngram_range=(1,3)
-            )
-
-=======
-            self.vectorizer = CountVectorizer(ngram_range=(1,3))
->>>>>>> c46ce1f49ca750f997992deaee448a4da0b29aa6
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
