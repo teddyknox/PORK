@@ -13,13 +13,10 @@ class Model(object):
         self.num_examples = num_examples
 
         # short-circuit conditional
-<<<<<<< HEAD
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression(penalty='l2')
             self.vectorizer = CountVectorizer(
                 ngram_range=(1,3))
-=======
-        if (not force_train and not self.unpickle()) or force_train: # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression()
             # self.reg = GradientBoostingRegressor(                    # or we do want to retrain
             #     n_estimators=100,
@@ -42,7 +39,7 @@ class Model(object):
                 # lowercase=True, 
                 ngram_range=(1,1)
             )
->>>>>>> 747adeca5d73a53362fe1114b5ccb9baa6a7a923
+
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
@@ -103,7 +100,7 @@ class Model(object):
         print "Testing model"
         cv = cross_validation.ShuffleSplit(n_examples, n_iter=4, test_size=.8)
         results = cross_validation.cross_val_score(self.reg, data, target, cv=cv, scoring='r2', n_jobs=4)
-        print sum(results)/len(results)
+        print results
 
     def load_reddit_csv(self, filename, num_examples=None):
         data_file = csv.reader(open(filename), delimiter=',', quotechar='"')
@@ -124,8 +121,6 @@ class Model(object):
             titles.append(d[3]) # the tenth item is the 'score'
             target[i] = d[10]
         data = self.vectorizer.fit_transform(titles).toarray()
-        print data
-        print target
         return data, target
 
 if __name__ == '__main__': # run from command line
@@ -136,6 +131,6 @@ if __name__ == '__main__': # run from command line
     args = parser.parse_args()
 
     # initialize model
-    model = Model('test.csv', num_examples=args.num_examples, force_train=args.force_train)    
+    model = Model('reddit.csv', num_examples=args.num_examples, force_train=args.force_train)    
     if args.test:
         model.train_test()
