@@ -103,7 +103,7 @@ class Model(object):
         for i, d in enumerate(data_file):
             if i == n_examples:
                 break
-            titles.append(d[10]) # the tenth item is the 'score'
+            titles.append(d[3]) # the tenth item is the 'score'
             target[i] = d[10]
         data = self.vectorizer.fit_transform(titles).toarray()
         return data, target
@@ -117,7 +117,7 @@ if __name__ == '__main__': # run from command line
     # initialize model
     model = Model('reddit.csv', num_examples=args.num_examples)
     if args.action == 'test':
-        model.test_train()
+        model.train_test()
     elif args.action == 'build':
         model.train()
         model.save()
