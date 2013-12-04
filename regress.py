@@ -3,7 +3,7 @@ import numpy as np
 import pickle
 import time
 from sklearn import cross_validation
-from sklearn.feature_extraction.text import HashingVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.linear_model import LogisticRegression
 import argparse
 
@@ -15,7 +15,7 @@ class Model(object):
         # short-circuit conditional
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression(penalty='l2')
-            self.vectorizer = HashingVectorizer(
+            self.vectorizer = CountVectorizer(
                 decode_error='ignore',
                 ngram_range=(1,3))
             if filename:
