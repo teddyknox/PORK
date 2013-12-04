@@ -62,6 +62,7 @@ class Model(object):
         data, target = self.load_reddit_csv(filename=fn, num_examples=ne)
         print time.time() - start, "seconds to vectorize"
         start = time.time()
+        print "Training model"
         self.reg.fit(data, target)
         print time.time() - start, "seconds to train"
         self.trained = True
