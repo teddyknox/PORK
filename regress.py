@@ -4,7 +4,7 @@ import pickle
 import time
 from sklearn import cross_validation
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LinearRegression
 import argparse
 
 class Model(object):
@@ -89,24 +89,23 @@ class Model(object):
         shape = next(data_file)
         n_examples = int(shape[0])
         n_features = int(shape[1])
-
         if num_examples:
             n_examples = min(n_examples, num_examples)
+
+        feature_names = np.array(next(data_file))
+
         # data = np.empty( (n_examples, n_features) )
-        titles = []
-        target = np.empty((n_examples,), dtype=np.int32)
-        feature_names = next(data_file)
-        np.array(feature_names)
-        max_v = -1
-        for i, d in enumerate(data_file):
-            if i == n_examples:
-                break
-            titles.append(d[3]) # the tenth item is the 'score'
-            target[i] = d[10]
-            max_v = i
-        print "Using examples 0 -", max_v
-        data = self.vectorizer.fit_transform(titles).toarray()
+        target_list = list(array_generator(data_file, 10, n_examples))
+        target = np.array(target_list, dtype=np.int32)
+
+        data = self.vectorizer.fit_transform(array_generator(data_file, 3, n_examples)).toarray()
         return data, target
+
+def array_generator(iterator, index, n):
+    i = 0
+    while i < n:
+        yield next(iterator)[index] # title
+        i += 1
 
 if __name__ == '__main__': # run from command line
     parser = argparse.ArgumentParser(description='Build or test a model using reddit.csv file.')
