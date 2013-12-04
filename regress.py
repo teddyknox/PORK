@@ -1,6 +1,7 @@
 import csv, copy
 import numpy as np
 import pickle
+import time
 from sklearn import cross_validation
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer, HashingVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -14,8 +15,7 @@ class Model(object):
         # short-circuit conditional
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression(penalty='l2')
-            self.vectorizer = CountVectorizer(
-                ngram_range=(1,3))
+            self.vectorizer = CountVectorizer(ngram_range=(1,3))
             if filename:
                 self.train(filename, num_examples=num_examples)
                 self.trained = True
@@ -42,6 +42,7 @@ class Model(object):
 
     def save(self):
         if self.trained:
+            start = time.time()
             print "Saving model"
             with open('model.pickle', 'wb') as model_file, open('vectorizer.pickle', 'wb') as vector_file:
                 try:
@@ -49,15 +50,20 @@ class Model(object):
                     pickle.dump(self.vectorizer, vector_file)
                 except pickle.PicklingError as e:
                     print "Error pickling"
+            print time.time() - start, "seconds to save"
         else:
             print "Model not trained, so why save?"
 
     def train(self, filename=None, num_examples=None):
         print "Building model"
+        start = time.time()
         fn = filename or self.filename
         ne = num_examples or self.num_examples        
         data, target = self.load_reddit_csv(filename=fn, num_examples=ne)
+        print time.time() - start, "seconds to vectorize"
+        start = time.time()
         self.reg.fit(data, target)
+        print time.time() - start, "seconds to train"
         self.trained = True
 
     def predict(self, title):
@@ -91,11 +97,14 @@ class Model(object):
         target = np.empty((n_examples,), dtype=np.int32)
         feature_names = next(data_file)
         np.array(feature_names)
+        max_v = -1
         for i, d in enumerate(data_file):
             if i == n_examples:
                 break
             titles.append(d[3]) # the tenth item is the 'score'
             target[i] = d[10]
+            max_v = i
+        print "Using examples 0 -", max_v
         data = self.vectorizer.fit_transform(titles).toarray()
         return data, target
 
