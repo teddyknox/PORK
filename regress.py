@@ -15,7 +15,7 @@ class Model(object):
         # short-circuit conditional
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = LogisticRegression(penalty='l2')
-            self.vectorizer = CountVectorizer(
+            self.vectorizer = TfidfVectorizer(
                 ngram_range=(1,3))
             if filename:
                 self.train(filename, num_examples=num_examples)
@@ -77,7 +77,7 @@ class Model(object):
         print "Testing model"
         cv = cross_validation.ShuffleSplit(n_examples, n_iter=4, test_size=.8)
         results = cross_validation.cross_val_score(self.reg, data, target, cv=cv, scoring='r2', n_jobs=4)
-        print sum(results)/len(results)
+        print results
 
     def load_reddit_csv(self, filename, num_examples=None):
         data_file = csv.reader(open(filename), delimiter=',', quotechar='"')
@@ -98,8 +98,6 @@ class Model(object):
             titles.append(d[3]) # the tenth item is the 'score'
             target[i] = d[10]
         data = self.vectorizer.fit_transform(titles).toarray()
-        print data
-        print target
         return data, target
 
 if __name__ == '__main__': # run from command line
