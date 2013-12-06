@@ -18,7 +18,7 @@ class Model(object):
         if force_train or not self.unpickle(): # if we don't want to retrain and we have nothing to load
             self.reg = SVR(kernel='linear', C=1e3, gamma=0.1)
             # self.reg = LogisticRegression(penalty='l2')
-            # self.vectorizer = CountVectorizer(ngram_range=(1,3))
+            # self.vectorizer = CountVectorizer(decode_error='ignore', ngram_range=(1,3))
             self.vectorizer = TfidfVectorizer(norm='l2', smooth_idf=True, sublinear_tf=True, use_idf=True)
             if filename:
                 self.train(filename, num_examples=num_examples)
@@ -101,12 +101,13 @@ class Model(object):
 
         feature_names = np.array(next(data_file))
 
-        # data = np.empty( (n_examples, n_features) )
-        target_list = list(array_generator(data_file, 10, n_examples))
         titles = array_generator(data_file, 3, n_examples)
-
-        target = np.array(target_list, dtype=np.int32)
+        targets = array_generator(data_file, 10, n_examples)
         data = self.vectorizer.fit_transform(titles).toarray()
+
+        target = np.array(list(targets), dtype=np.int32)
+
+        print data.shape
         return data, target
 
 def calc_stats(filename, num_examples=None):
@@ -150,11 +151,11 @@ def calc_stats(filename, num_examples=None):
         val = avg_scores[k]
         print "Average",k,"word title score:", float(val) / avg_counts[k]
 
-def array_generator(iterator, index, n):
-    i = 0
-    while i < n:
-        yield next(iterator)[index] # title
-        i += 1
+def array_generator(iterator, index, n=None):
+    for i, d in enumerate(iterator):
+        if n and i >= n:
+            break
+        yield d[index]
 
 if __name__ == '__main__': # run from command line
     parser = argparse.ArgumentParser(description='Build or test a model using reddit.csv file.')
