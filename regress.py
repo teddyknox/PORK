@@ -88,7 +88,7 @@ class Model(object):
         n_examples = data.shape[0]
         print "Testing model"
         cv = cross_validation.ShuffleSplit(n_examples, n_iter=4, test_size=.8)
-        results = cross_validation.cross_val_score(self.reg, data, target, cv=cv, scoring='r2', n_jobs=4)
+        results = cross_validation.cross_val_score(self.reg, data, target, cv=cv, scoring='mean_squared_error', n_jobs=4)
         print results
 
     def load_reddit_csv(self, filename, num_examples=None, split=0.8):
@@ -125,6 +125,8 @@ def calc_stats(filename, num_examples=None):
     avg_counts = {}
     max_score = float("-inf")
     min_score = float("inf")
+    word_scores = {}
+    word_counts = {}
     for i, n in enumerate(data_file):
         if i >= n_examples:
             break
@@ -135,6 +137,14 @@ def calc_stats(filename, num_examples=None):
         if not length in avg_counts:
             avg_counts[length] = 0
         avg_scores[length] += int(n[10])
+        words = n[3].lower()
+        for w in words.split(" "):
+            if not w in word_counts:
+                word_counts[w] = 0
+            word_counts[w] += 1
+            if not w in word_scores:
+                word_scores[w] = 0
+            word_scores[w] += score
         avg_counts[length] += 1
         avg_length += length
         avg_score += score
@@ -142,14 +152,21 @@ def calc_stats(filename, num_examples=None):
             max_score = score
         if score < min_score:
             min_score = score
+
     print "Average Title Length:\t", float(avg_length) / n_examples
     print "Average Score:\t\t", float(avg_score) / n_examples
     print "Maximum Score:\t\t", float(max_score)
     print "Minimum Score:\t\t", float(min_score)
 
+    for w in word_scores.keys():
+        word_scores[w] /= word_counts[w]
+    sorted_x = sorted(word_scores, key=word_scores.get)
+    print sorted_x
+    for w in sorted_x:
+        print "Average score for sentence with word:",w," - ",word_scores[w]
     for k in avg_scores.keys():
         val = avg_scores[k]
-        print "Average",k,"word title score:", float(val) / avg_counts[k]
+        # print "Average",k,"word title score:", float(val) / avg_counts[k]
 
 def array_generator(iterator, index, n=None):
     for i, d in enumerate(iterator):
